@@ -21,20 +21,25 @@ public class ComputeNode {
     }
 
     public synchronized boolean isFree() {
-        // TODO: retornar true solo si el estado es FREE
-        return false;
+        // retorna true solo si el estado es FREE
+        return this.state == NodeState.FREE;
     }
 
     public synchronized void assignJob() {
-        // TODO: cambiar estado a BUSY e incrementar executionCount
+        // cambia estado a BUSY
+        this.state = NodeState.BUSY;
+        // 2. Incrementa el contador de ejecuciones
+        this.executionCount++;
     }
 
     public synchronized void setFree() {
-        // TODO: cambiar estado a FREE
+        // cambia estado a FREE
+        this.state = NodeState.FREE;
     }
 
     public synchronized void setOutOfService() {
-        // TODO: cambiar estado a OUT_OF_SERVICE
+        // cambia estado a OUT_OF_SERVICE
+        this.state = NodeState.OUT_OF_SERVICE;
     }
 
     public synchronized int getExecutionCount() {
