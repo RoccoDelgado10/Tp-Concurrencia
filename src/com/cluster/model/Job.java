@@ -1,7 +1,7 @@
 package com.cluster.model;
 
 public class Job {
-
+//Roco es crack
     private final int id;
     private JobStatus status;
     private int assignedNodeId;
