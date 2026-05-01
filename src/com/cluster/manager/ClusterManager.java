@@ -92,6 +92,7 @@ public class ClusterManager {
      */
     public Job pollFromExecution() throws InterruptedException {
         // TODO: tomar un job de jobsInExecution (usar take() para bloquear si está vacía)
+
         return null;
     }
 

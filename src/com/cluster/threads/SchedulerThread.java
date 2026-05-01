@@ -2,7 +2,6 @@ package com.cluster.threads;
 
 import com.cluster.manager.ClusterManager;
 import com.cluster.model.ComputeNode;
-import com.cluster.model.Job;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
