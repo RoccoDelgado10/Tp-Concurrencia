@@ -5,8 +5,9 @@ import com.cluster.model.Job;
 import java.util.Random;
 
 public class WorkerThread implements Runnable {
-
+    // Se define el tiempo de demora de esta etapa en milisegundos
     private static final int DELAY_MS = 100;
+    // Probabilidad de que un job sea válido (90%)
     private static final double SUCCESS_PROBABILITY = 0.90;
 
     private final ClusterManager clusterManager;
@@ -19,21 +20,24 @@ public class WorkerThread implements Runnable {
 
     @Override
     public void run() {
+        // Repite hasta que el sistema haya terminado de procesar
         while (!clusterManager.isFinished()) {
             try {
+                // Se toma un job de la cola de validación
                 Job job = clusterManager.pollFromExecution();
 
                 if (job == null) continue;
-
-                boolean isSuccess = random.nextDouble() < SUCCESS_PROBABILITY;
+                // Se simula validación con probabilidad VALID_PROBABILITY
+                boolean isSuccess = random.nextDouble() < SUCCESS_PROBABILITY;// random.nextDouble() genera un número entre 0.0 y 1.0
 
                 if (isSuccess) {
-                    clusterManager.moveToFinished(job);
+                    clusterManager.moveToFinished(job);// Se mueve el job a finalizados
+                    clusterManager.incrementProcessed(); // Se incrementa el contador de procesados
                 } else {
-                    clusterManager.moveToFailed(job);
-                    clusterManager.incrementProcessed();
+                    clusterManager.moveToFailed(job); // Se mueve el job a fallidos
+                    clusterManager.incrementProcessed();// Se incrementa el contador de procesados
                 }
-
+                //Se aplica una demora fija
                 Thread.sleep(DELAY_MS);
 
             } catch (InterruptedException e) {
