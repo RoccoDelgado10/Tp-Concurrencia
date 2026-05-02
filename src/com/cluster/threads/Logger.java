@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.io.File;
 
 public class Logger implements Runnable {
 
@@ -23,12 +24,14 @@ public class Logger implements Runnable {
 
     @Override
     public void run() {
-        // TODO: asegurarse de que exista la carpeta "logs/" antes de escribir
-        // Sugerencia: new File("logs").mkdirs()
+        new File("logs").mkdirs(); // Nos aseguramos de que el directorio de logs exista
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(LOG_FILE_PATH, true))) {
 
-            // TODO: escribir encabezado del log con fecha y hora de inicio
+            String inicio = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")); // Formateamos la fecha de inicio
+            writer.write("=== LOG INICIADO: " + inicio + " ===");
+            writer.newLine();
+            writer.flush();
 
             // Loop periódico: registrar stats cada 200ms mientras el sistema corre
             while (!clusterManager.isFinished()) {
@@ -41,8 +44,7 @@ public class Logger implements Runnable {
                 }
             }
 
-            // TODO: al terminar, escribir las estadísticas finales
-            writeFinalStats(writer);
+            writeFinalStats(writer); // Al terminar, se escribe las estadísticas finales
 
         } catch (IOException e) {
             System.err.println("Error escribiendo el log: " + e.getMessage());
@@ -54,14 +56,15 @@ public class Logger implements Runnable {
      * Formato sugerido: [timestamp] Failed: X | Validated: Y
      */
     private void writeStats(BufferedWriter writer) throws IOException {
-        // TODO: obtener stats con clusterManager.getStats()
-        // TODO: escribir una línea con timestamp, failedCount y validatedCount
+        // Se escribe una línea con timestamp, failedCount y validatedCount
         int[] stats = clusterManager.getStats();
 
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss.SSS"));
         String line = "[" + timestamp + "] Failed: " + stats[0] + " | Validated: " + stats[1];
 
-        // TODO: escribir `line` en el writer y hacer flush
+         writer.write(line);
+        writer.newLine();
+        writer.flush();
     }
 
     /**
@@ -71,8 +74,19 @@ public class Logger implements Runnable {
     private void writeFinalStats(BufferedWriter writer) throws IOException {
         long totalTimeMs = System.currentTimeMillis() - startTime;
 
-        // TODO: escribir separador y título de estadísticas finales
-        // TODO: escribir clusterManager.getNodeStats()
-        // TODO: escribir el tiempo total en segundos (totalTimeMs / 1000.0)
+        // Separador y título
+        writer.write("==========================================");
+        writer.newLine();
+        writer.write("=== ESTADÍSTICAS FINALES ===");
+        writer.newLine();
+
+        // Stats de nodos
+        writer.write(clusterManager.getNodeStats());
+        writer.newLine();
+
+        // Tiempo total
+        writer.write("Tiempo total de ejecución: " + (totalTimeMs / 1000.0) + " segundos");
+        writer.newLine();
+        writer.flush();
     }
 }
