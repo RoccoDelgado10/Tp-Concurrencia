@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class WorkerThread implements Runnable {
     // Se define el tiempo de demora de esta etapa en milisegundos
-    private static final int DELAY_MS = 100;
+    private static final int DELAY_MS = 200;
     // Probabilidad de que un job sea válido (90%)
     private static final double SUCCESS_PROBABILITY = 0.90;
 
@@ -23,7 +23,7 @@ public class WorkerThread implements Runnable {
         // Repite hasta que el sistema haya terminado de procesar
         while (!clusterManager.isFinished()) {
             try {
-                // Se toma un job de la cola de validación
+                // Se toma un job de la cola de ejecución (con timeout)
                 Job job = clusterManager.pollFromExecution();
 
                 if (job == null) continue;
