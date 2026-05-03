@@ -9,7 +9,7 @@ public class AuditorThread implements Runnable {
 
     // definino el tiempo de demora de esta etapa en milisegundos
 
-    private static final int DELAY_MS = 5;
+    private static final int DELAY_MS = 10;
 
     // Probabilidad de que el resultado sea correcto (95%)
     private static final double CORRECT_PROBABILITY = 0.95;
@@ -24,8 +24,8 @@ public class AuditorThread implements Runnable {
 
     @Override
     public void run() {
-        // Repite hasta que el sistema haya terminado de procesar Y no haya jobs pendientes en finalizados
-        while (!clusterManager.isFinished() || clusterManager.hasFinishedJobs()) {
+        // Repito hasta que el sistema haya terminado de procesar
+        while (!clusterManager.isFinished()) {
             try {
                 // toma un job de finalizados (clusterManager.pollFromFinished())
                 Job job = clusterManager.pollFromFinished();

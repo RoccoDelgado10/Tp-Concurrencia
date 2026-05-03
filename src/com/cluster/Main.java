@@ -52,7 +52,7 @@ public class Main {
             allThreads.add(t);
         }
 
-        // --- Logger (corre en paralelo a todo) ---
+        // --- Logger (corre en paralelo a tod0) ---
         Thread loggerThread = new Thread(new Logger(clusterManager), "Logger");
 
         // lanzar todos los hilos de allThreads
