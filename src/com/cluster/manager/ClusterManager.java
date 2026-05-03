@@ -140,7 +140,11 @@ public class ClusterManager {
      */
     public String getNodeStats() {
         // TODO: construir un String con el estado y executionCount de cada nodo
-        return "";
+        StringBuilder EstadoGeneral;
+        for (int i = 0; i < TOTAL_NODES; i++) {
+            EstadoGeneral += nodes[i].getState();
+        }
+        return EstadoGeneral;
     }
 
     /**
@@ -148,7 +152,7 @@ public class ClusterManager {
      */
     public boolean isFinished() {
         // TODO: retornar true cuando processedJobsCount >= TOTAL_JOBS
-        return false;
+        return processedJobsCount.get() >= TOTAL_JOBS;
     }
 
     public void incrementProcessed() {
