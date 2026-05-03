@@ -7,8 +7,9 @@ import java.util.Random;
 
 public class AuditorThread implements Runnable {
 
-    // TODO (equipo): definir el tiempo de demora de esta etapa en milisegundos
-    private static final int DELAY_MS = 0;
+    // definino el tiempo de demora de esta etapa en milisegundos
+
+    private static final int DELAY_MS = 10;
 
     // Probabilidad de que el resultado sea correcto (95%)
     private static final double CORRECT_PROBABILITY = 0.95;
@@ -23,31 +24,31 @@ public class AuditorThread implements Runnable {
 
     @Override
     public void run() {
-        // TODO: repetir hasta que el sistema haya terminado de procesar
+        // Repito hasta que el sistema haya terminado de procesar
         while (!clusterManager.isFinished()) {
-
             try {
-                // TODO: tomar un job de finalizados (clusterManager.pollFromFinished())
-                Job job = null;
+                // toma un job de finalizados (clusterManager.pollFromFinished())
+                Job job = clusterManager.pollFromFinished();
 
                 if (job == null) {
                     // Si no hay jobs, esperar un poco antes de reintentar
                     Thread.sleep(10);
                     continue;
                 }
-
-                // TODO: simular verificación con probabilidad CORRECT_PROBABILITY
-                boolean isCorrect = false; // random.nextDouble() < CORRECT_PROBABILITY
+                // Se simula validación con probabilidad VALID_PROBABILITY
+                boolean isCorrect = random.nextDouble() < CORRECT_PROBABILITY;
 
                 if (isCorrect) {
-                    // TODO: mover el job a validados (clusterManager.moveToValidated(job))
+                    // muevo el job a validados (clusterManager.moveToValidated(job))
+                    clusterManager.moveToValidated(job);
                 } else {
-                    // TODO: mover el job a fallidos (clusterManager.moveToFailed(job))
+                    // muevo el job a fallidos (clusterManager.moveToFailed(job))
+                    clusterManager.moveToFailed(job);
                 }
 
-                // TODO: incrementar el contador de procesados en ambos casos
-
-                // TODO: aplicar demora fija
+                // incrementar el contador de procesados en ambos casos
+                clusterManager.incrementProcessed();
+                // aplicar demora fija
                 Thread.sleep(DELAY_MS);
 
             } catch (InterruptedException e) {
