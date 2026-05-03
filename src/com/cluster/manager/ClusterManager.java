@@ -3,12 +3,14 @@ package com.cluster.manager;
 import com.cluster.model.ComputeNode;
 import com.cluster.model.Job;
 import com.cluster.model.JobStatus;
+import com.cluster.model.NodeState;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClusterManager {
@@ -56,29 +58,14 @@ public class ClusterManager {
      * Debe garantizar acceso exclusivo al nodo encontrado.
      * @return un ComputeNode libre, o null si no hay ninguno disponible
      */
+    //(inicio aleatorio + escaneo circular). Ventajas: rápido y distribuye carga
     public ComputeNode getFreeNode() {
-        // TODO: recorrer los nodos en orden aleatorio buscando uno con estado FREE
-        // IMPORTANTE: el acceso al nodo debe ser exclusivo (evitar race condition)
-        // Sugerencia: usar synchronized sobre el nodo candidato antes de verificar su estado
-
-        //Creamos un arreglo de entero que guardará los índices de los nodos
-        Integer[] indices = new Integer[TOTAL_NODES];
-
-        for (int i = 0; i < TOTAL_NODES; i++) {
-            indices[i] = i;
-        }
-        //mezclamos los indices para que se acceda de manera aleatoria
-        Collections.shuffle(Arrays.asList(indices));
-
-        //ahora recorremos los nodos de manera aletoria buscando uno que esté libre
-        for (int index : indices) {
-            int pos = indice[i];
-            ComputeNode candidato = nodes[pos];
-
-            synchronized(candidato){
-            if(candidato.getState() == NodeState.FREE){
-                candidato.assignJob(); //marcamos el nodo como ocupado
-                return candidato; //retornamos el nodo encontrado
+        int start = ThreadLocalRandom.current().nextInt(TOTAL_NODES);
+        for(int i=0; i <= TOTAL_NODES;i++) {
+            int idx = (start + i) % TOTAL_NODES;
+            synchronized (nodes[idx]) {
+                if (nodes[idx].isFree()) {
+                    return nodes[idx];
                 }
             }
         }
@@ -89,9 +76,8 @@ public class ClusterManager {
      * Agrega un job a la cola de jobs en espera.
      */
     public void enqueueJob(Job job) {
-        // TODO: agregar el job a jobsInQueue y actualizar su estado a QUEUED
-        job.setState(JobStatus.QUEUED);
         jobsInQueue.add(job);
+        job.setStatus(JobStatus.QUEUED);
     }
 
     /**
@@ -99,7 +85,6 @@ public class ClusterManager {
      * @return el siguiente job disponible
      */
     public Job pollFromQueue() throws InterruptedException {
-        // TODO: tomar un job de jobsInQueue (usar take() para bloquear si está vacía)
         return jobsInQueue.take();
     }
 
@@ -107,9 +92,10 @@ public class ClusterManager {
      * Mueve un job a la cola de ejecución.
      */
     public void moveToExecution(Job job) {
-        // TODO: cambiar estado del job a IN_EXECUTION y agregarlo a jobsInExecution
-        job.setState(JobStatus.IN_EXECUTION);
+        if(job == null)return;
         jobsInExecution.add(job);
+        job.setStatus(JobStatus.IN_EXECUTION);
+
     }
 
     /**
@@ -117,7 +103,6 @@ public class ClusterManager {
      * @return el siguiente job disponible
      */
     public Job pollFromExecution() throws InterruptedException {
-        // TODO: tomar un job de jobsInExecution (usar take() para bloquear si está vacía)
         return jobsInExecution.take();
     }
 
@@ -125,9 +110,12 @@ public class ClusterManager {
      * Mueve un job a la lista de finalizados.
      */
     public void moveToFinished(Job job) {
-        // TODO: cambiar estado del job a FINISHED y agregarlo a finishedJobs
-        job.setState(JobStatus.FINISHED);
-        finishedJobs.add(job);
+        if(job == null)return;
+        synchronized (finishedJobs) {
+            jobsInExecution.remove(job);
+            finishedJobs.add(job);
+            job.setStatus(JobStatus.FINISHED);
+        }
     }
 
     /**
@@ -135,21 +123,19 @@ public class ClusterManager {
      * @return el siguiente job disponible, o null si no hay
      */
     public Job pollFromFinished() {
-        // TODO: obtener y remover un job de finishedJobs de forma thread-safe
-        synchronized(finishedJobs){
-            if(finishedJobs.isEmpty()){
-                return null;
-            }
+        //lockeamos con la lista para que ningun hilo entre a cambiar
+        synchronized (finishedJobs) {
+            if(finishedJobs.isEmpty()) return null;
+            return finishedJobs.remove(0);
         }
-        return finishedJobs.remove(0);
     }
 
     /**
      * Mueve un job a la lista de fallidos.
      */
     public void moveToFailed(Job job) {
-        // TODO: cambiar estado del job a FAILED, agregar a failedJobs e incrementar failedCount
-        job.setState(JobStatus.FAILED);
+        // cambiar estado del job a FAILED, agregar a failedJobs e incrementar failedCount
+        job.setStatus(JobStatus.FAILED);
         failedJobs.add(job);
         failedCount.incrementAndGet();
     }
@@ -158,17 +144,18 @@ public class ClusterManager {
      * Mueve un job a la lista de validados.
      */
     public void moveToValidated(Job job) {
-        // TODO: cambiar estado del job a VALIDATED, agregar a validatedJobs e incrementar validatedCount
-        job.setState(JobStatus.VALIDATED);
+        //  cambiar estado del job a VALIDATED, agregar a validatedJobs e incrementar validatedCount
+        job.setStatus(JobStatus.VALIDATED);
         validatedJobs.add(job);
         validatedCount.incrementAndGet();
+
     }
 
     /**
      * Retorna las estadísticas actuales para el Logger periódico.
      */
     public int[] getStats() {
-        // TODO: retornar [failedCount, validatedCount]
+        // retornar [failedCount, validatedCount]
         return new int[]{failedCount.get(), validatedCount.get()};
     }
 
@@ -177,23 +164,20 @@ public class ClusterManager {
      * Usado por el Logger al terminar el programa.
      */
     public String getNodeStats() {
-        // TODO: construir un String con el estado y executionCount de cada nodo
-        Stringbuilder sb = new StringBuilder(); //usamos StringBuilder para construir el string de manera eficiente
-        for(ComputeNode node : nodes){
-            sb.append(node.toString()).append("\n"); //agregamos la información de cada nodo al StringBuilder, separando por saltos de línea
+        //construir un String con el estado y executionCount de cada nodo
+        StringBuilder EstadoGeneral = new StringBuilder();
+        for (int i = 0; i < TOTAL_NODES; i++) {
+            EstadoGeneral.append(nodes[i].toString()).append(System.lineSeparator());
         }
-        return sb.toString(); //retornamos el string construido con la información de todos los nodos
+        return EstadoGeneral.toString();
     }
 
     /**
      * Indica si el sistema ya terminó de procesar todos los jobs.
      */
     public boolean isFinished() {
-        // TODO: retornar true cuando processedJobsCount >= TOTAL_JOBS
-        if(processedJobsCount.get() >= TOTAL_JOBS){
-            return true;
-        }
-        return false;
+        // retornar true cuando processedJobsCount >= TOTAL_JOBS
+        return processedJobsCount.get() >= TOTAL_JOBS;
     }
 
     public void incrementProcessed() {

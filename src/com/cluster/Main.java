@@ -56,9 +56,11 @@ public class Main {
         Thread loggerThread = new Thread(new Logger(clusterManager), "Logger");
 
         // TODO: lanzar todos los hilos de allThreads
+
         // TODO: lanzar el loggerThread
 
         // TODO: esperar a que todos los hilos terminen (join)
+
         // TODO: esperar a que el loggerThread termine (join)
 
         System.out.println("Sistema finalizado. Revisar logs/cluster_stats.log para resultados.");

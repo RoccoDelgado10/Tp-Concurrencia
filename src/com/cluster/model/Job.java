@@ -1,7 +1,7 @@
 package com.cluster.model;
 
 public class Job {
-
+//Roco es crack
     private final int id;
     private JobStatus status;
     private int assignedNodeId;
@@ -17,12 +17,10 @@ public class Job {
     }
 
     public synchronized JobStatus getStatus() {
-        // TODO: retornar el estado actual del job
         return status;
     }
 
     public synchronized void setStatus(JobStatus status) {
-        // TODO: actualizar el estado del job
         this.status = status;
     }
 
@@ -31,7 +29,6 @@ public class Job {
     }
 
     public synchronized void setAssignedNodeId(int nodeId) {
-        // TODO: asignar el id del nodo al job
         this.assignedNodeId = nodeId;
     }
 
