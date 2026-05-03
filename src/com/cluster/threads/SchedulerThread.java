@@ -24,21 +24,19 @@ public class SchedulerThread implements Runnable {
 
     @Override
     public void run() {
-        // TODO: repetir hasta que se hayan generado todos los jobs (TOTAL_JOBS)
-        // usamos variable booleana del objeto clusterManager
+        //  repetir hasta que se hayan generado todos los jobs (TOTAL_JOBS)
         while (true) {
-            // TODO: obtener el siguiente id de job de forma atómica
+            //  obtener el siguiente id de job de forma atómica
             // Si el id supera TOTAL_JOBS, salir del loop
-            int jobId = jobIdCounter.getAndIncrement(); // reemplazar con jobIdCounter
+            int jobId = jobIdCounter.getAndIncrement();
             // Hilo 1 obtiene 1, Hilo 2 obtiene 2, Hilo 3 obtiene 3
             // Siempre únicos, siempre en orden
-            //¿Cómo funciona una instruccion a nivel de hardware?
 
             //si el el job id siguiente es mayor que el numero total que salga del loop
             if(jobId > ClusterManager.TOTAL_JOBS){break;}
-            // TODO: crear un nuevo Job con ese id
+            //  crear un nuevo Job con ese id
             Job job = new Job(jobId);
-            // TODO: buscar un nodo libre llamando a clusterManager.getFreeNode()
+            //  buscar un nodo libre llamando a clusterManager.getFreeNode()
             ComputeNode node = null;
 
             while(node == null) {
@@ -52,13 +50,13 @@ public class SchedulerThread implements Runnable {
                     }
                 }
             }
-            // TODO: asignar el job al nodo (node.assignJob())
+            // asignar el job al nodo (node.assignJob())
             node.assignJob();
-            // TODO: setear el assignedNodeId en el job
+            //  setear el assignedNodeId en el job
             job.setAssignedNodeId(node.getId());
-            // TODO: encolar el job (clusterManager.enqueueJob(job))
+            //  encolar el job (clusterManager.enqueueJob(job))
             clusterManager.enqueueJob(job);
-            // TODO: aplicar la demora fija de esta etapa (Thread.sleep(DELAY_MS))
+            //  aplicar la demora fija de esta etapa (Thread.sleep(DELAY_MS))
             try {
                 Thread.sleep(DELAY_MS);
             } catch (InterruptedException e) {
