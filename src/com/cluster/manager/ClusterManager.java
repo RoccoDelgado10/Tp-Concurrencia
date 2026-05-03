@@ -17,7 +17,7 @@ public class ClusterManager {
 
     // Configuración del sistema
     public static final int TOTAL_NODES = 200;
-    public static final int TOTAL_JOBS   = 500;
+    public static final int TOTAL_JOBS   = 499;
 
     // Matriz de nodos (se puede tratar como array lineal)
     private final ComputeNode[] nodes;
@@ -81,11 +81,11 @@ public class ClusterManager {
     }
 
     /**
-     * Toma un job de la cola de jobs en espera (bloqueante).
-     * @return el siguiente job disponible
+     * Toma un job de la cola de jobs en espera (con timeout para evitar bloqueo indefinido).
+     * @return el siguiente job disponible, o null si timeout
      */
     public Job pollFromQueue() throws InterruptedException {
-        return jobsInQueue.take();
+        return jobsInQueue.poll(500, java.util.concurrent.TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -99,11 +99,11 @@ public class ClusterManager {
     }
 
     /**
-     * Toma un job de la cola de ejecución (bloqueante).
-     * @return el siguiente job disponible
+     * Toma un job de la cola de ejecución (con timeout para evitar bloqueo indefinido).
+     * @return el siguiente job disponible, o null si timeout
      */
     public Job pollFromExecution() throws InterruptedException {
-        return jobsInExecution.take();
+        return jobsInExecution.poll(500, java.util.concurrent.TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -156,7 +156,7 @@ public class ClusterManager {
      */
     public int[] getStats() {
         // retornar [failedCount, validatedCount]
-        return new int[]{failedCount.get(), validatedCount.get()};
+        return new int[]{failedCount.get(), validatedCount.get(), processedJobsCount.get()};
     }
 
     /**
@@ -182,6 +182,20 @@ public class ClusterManager {
 
     public void incrementProcessed() {
         processedJobsCount.incrementAndGet();
+    }
+
+    public boolean hasFinishedJobs() {
+        return !finishedJobs.isEmpty();
+    }
+
+    public void resetOutOfServiceNodes() {
+        for (int i = 0; i < TOTAL_NODES; i++) {
+            synchronized (nodes[i]) {
+                if (nodes[i].getState() == NodeState.OUT_OF_SERVICE) {
+                    nodes[i].setFree();  // Reciclar nodos
+                }
+            }
+        }
     }
 
     // --- Getters de colecciones (para consultas o debug) ---
