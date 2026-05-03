@@ -23,7 +23,7 @@ public class WorkerThread implements Runnable {
         // Repite hasta que el sistema haya terminado de procesar
         while (!clusterManager.isFinished()) {
             try {
-                // Se toma un job de la cola de ejecución (con timeout)
+                // Se toma un job de la cola de validación
                 Job job = clusterManager.pollFromExecution();
 
                 if (job == null) continue;

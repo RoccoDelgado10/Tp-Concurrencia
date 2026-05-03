@@ -28,8 +28,8 @@ public class ValidatorThread implements Runnable {
         while (!clusterManager.isFinished()) {
 
             try {
-                // Se toma un job de la cola de validación (con timeout)
-                Job job = clusterManager.pollFromQueue();
+                // Se toma un job de la cola de validación
+                Job job = clusterManager.pollFromQueue(); // Bloquea si queue vacia y retorna null si timeout
 
                 if (job == null) continue;
 

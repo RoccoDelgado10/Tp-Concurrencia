@@ -24,8 +24,8 @@ public class AuditorThread implements Runnable {
 
     @Override
     public void run() {
-        // Repite hasta que el sistema haya terminado de procesar Y no haya jobs pendientes en finalizados
-        while (!clusterManager.isFinished() || clusterManager.hasFinishedJobs()) {
+        // Repito hasta que el sistema haya terminado de procesar
+        while (!clusterManager.isFinished()) {
             try {
                 // toma un job de finalizados (clusterManager.pollFromFinished())
                 Job job = clusterManager.pollFromFinished();

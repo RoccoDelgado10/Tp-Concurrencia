@@ -59,20 +59,7 @@ public class Main {
         for (Thread t : allThreads) t.start();
         loggerThread.start();
 
-        // Monitoreo: si tarda mucho, recicla nodos out-of-service
-        Thread nodeRecycler = new Thread(() -> {
-            while (!clusterManager.isFinished()) {
-                try {
-                    Thread.sleep(1000);  // Cada segundo
-                    clusterManager.resetOutOfServiceNodes();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break;
-                }
-            }
-        }, "NodeRecycler");
-        nodeRecycler.start();
-
+        //esperamos a que los hilos terminen antes de finalizar el programa
         for (Thread t : allThreads) {
             try {
                 t.join();
@@ -82,7 +69,6 @@ public class Main {
         }
         //esperar a que el loggerThread termine (join)
         loggerThread.join();
-        nodeRecycler.join();
         System.out.println("Sistema finalizado. Revisar logs/cluster_stats.log para resultados.");
     }
 }

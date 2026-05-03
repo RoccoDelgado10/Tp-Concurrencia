@@ -7,10 +7,7 @@ import com.cluster.model.NodeState;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClusterManager {
@@ -81,11 +78,12 @@ public class ClusterManager {
     }
 
     /**
-     * Toma un job de la cola de jobs en espera (con timeout para evitar bloqueo indefinido).
-     * @return el siguiente job disponible, o null si timeout
+     * Toma un job de la cola de jobs en espera (bloqueante).
+     * @return el siguiente job disponible
      */
     public Job pollFromQueue() throws InterruptedException {
-        return jobsInQueue.poll(500, java.util.concurrent.TimeUnit.MILLISECONDS);
+
+        return jobsInQueue.poll(500, TimeUnit.MILLISECONDS );
     }
 
     /**
@@ -99,11 +97,11 @@ public class ClusterManager {
     }
 
     /**
-     * Toma un job de la cola de ejecución (con timeout para evitar bloqueo indefinido).
-     * @return el siguiente job disponible, o null si timeout
+     * Toma un job de la cola de ejecución (bloqueante).
+     * @return el siguiente job disponible
      */
     public Job pollFromExecution() throws InterruptedException {
-        return jobsInExecution.poll(500, java.util.concurrent.TimeUnit.MILLISECONDS);
+        return jobsInExecution.poll(500, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -182,20 +180,6 @@ public class ClusterManager {
 
     public void incrementProcessed() {
         processedJobsCount.incrementAndGet();
-    }
-
-    public boolean hasFinishedJobs() {
-        return !finishedJobs.isEmpty();
-    }
-
-    public void resetOutOfServiceNodes() {
-        for (int i = 0; i < TOTAL_NODES; i++) {
-            synchronized (nodes[i]) {
-                if (nodes[i].getState() == NodeState.OUT_OF_SERVICE) {
-                    nodes[i].setFree();  // Reciclar nodos
-                }
-            }
-        }
     }
 
     // --- Getters de colecciones (para consultas o debug) ---
