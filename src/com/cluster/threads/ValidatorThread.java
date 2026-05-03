@@ -8,8 +8,8 @@ import java.util.Random;
 
 public class ValidatorThread implements Runnable {
 
-    // TODO (equipo): definir el tiempo de demora de esta etapa en milisegundos
-    private static final int DELAY_MS = 0;
+    // Se define el tiempo de demora de esta etapa en milisegundos
+    private static final int DELAY_MS = 100;
 
     // Probabilidad de que un job sea válido (85%)
     private static final double VALID_PROBABILITY = 0.85;
@@ -24,31 +24,31 @@ public class ValidatorThread implements Runnable {
 
     @Override
     public void run() {
-        // TODO: repetir hasta que el sistema haya terminado de procesar
+        // Repite hasta que el sistema haya terminado de procesar
         while (!clusterManager.isFinished()) {
 
             try {
-                // TODO: tomar un job de la cola (clusterManager.pollFromQueue())
-                Job job = null;
+                // Se toma un job de la cola de validación
+                Job job = clusterManager.pollFromQueue();
 
                 if (job == null) continue;
 
-                // TODO: obtener el nodo asignado al job usando job.getAssignedNodeId()
-                ComputeNode node = null; // clusterManager.getNodes()[job.getAssignedNodeId()]
+                //Obtengo el nodo asignado al job usando 
+                ComputeNode node = clusterManager.getNodes()[job.getAssignedNodeId()];
 
-                // TODO: simular validación con probabilidad VALID_PROBABILITY
-                boolean isValid = false; // random.nextDouble() < VALID_PROBABILITY
+                // Se simula validación con probabilidad VALID_PROBABILITY
+                boolean isValid = random.nextDouble() < VALID_PROBABILITY; // random.nextDouble() genera un número entre 0.0 y 1.0
 
                 if (isValid) {
-                    // TODO: liberar el nodo (node.setFree())
-                    // TODO: mover el job a ejecución (clusterManager.moveToExecution(job))
+                    node.setFree(); //libera el nodo (node.setFree())
+                    clusterManager.moveToExecution(job); //Se mueve el job a ejecución
                 } else {
-                    // TODO: poner el nodo fuera de servicio (node.setOutOfService())
-                    // TODO: mover el job a fallidos (clusterManager.moveToFailed(job))
-                    // TODO: incrementar el contador de procesados
+                    node.setOutOfService(); //Se pone el nodo fuera de servicio
+                    clusterManager.moveToFailed(job); //Se mueve el job a fallidos
+                    clusterManager.incrementProcessed(); //Se incrementa el contador de procesados
                 }
 
-                // TODO: aplicar demora fija
+                //Se aplica una demora fija
                 Thread.sleep(DELAY_MS);
 
             } catch (InterruptedException e) {
