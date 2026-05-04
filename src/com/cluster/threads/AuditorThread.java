@@ -44,10 +44,11 @@ public class AuditorThread implements Runnable {
                 } else {
                     // muevo el job a fallidos (clusterManager.moveToFailed(job))
                     clusterManager.moveToFailed(job);
+                    clusterManager.incrementProcessed();
                 }
 
                 // incrementar el contador de procesados en ambos casos
-                clusterManager.incrementProcessed();
+                //clusterManager.incrementProcessed();
                 // aplicar demora fija
                 Thread.sleep(DELAY_MS);
 
