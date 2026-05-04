@@ -32,11 +32,10 @@ public class WorkerThread implements Runnable {
 
                 if (isSuccess) {
                     clusterManager.moveToFinished(job);// Se mueve el job a finalizados
-                    clusterManager.incrementProcessed(); // Se incrementa el contador de procesados
                 } else {
                     clusterManager.moveToFailed(job); // Se mueve el job a fallidos
-                    clusterManager.incrementProcessed();// Se incrementa el contador de procesados
                 }
+                clusterManager.incrementProcessed();
                 //Se aplica una demora fija
                 Thread.sleep(DELAY_MS);
 

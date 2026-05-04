@@ -8,7 +8,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SchedulerThread implements Runnable {
 
-    // TODO (equipo): definir el tiempo de demora de esta etapa en milisegundos
     private static final int DELAY_MS = 5;
 
     private final ClusterManager clusterManager;
