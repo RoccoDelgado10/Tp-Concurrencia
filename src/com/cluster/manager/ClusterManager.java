@@ -14,7 +14,7 @@ public class ClusterManager {
 
     // Configuración del sistema
     public static final int TOTAL_NODES = 200;
-    public static final int TOTAL_JOBS   = 499;
+    public static final int TOTAL_JOBS   = 500;
 
     // Matriz de nodos (se puede tratar como array lineal)
     private final ComputeNode[] nodes;

@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SchedulerThread implements Runnable {
 
-    private static final int DELAY_MS = 5;
+    private static final int DELAY_MS = 100;
 
     private final ClusterManager clusterManager;
     private final AtomicInteger jobIdCounter;
@@ -37,7 +37,7 @@ public class SchedulerThread implements Runnable {
             Job job = new Job(jobId);
             //  buscar un nodo libre llamando a clusterManager.getFreeNode()
             ComputeNode node = null;
-            while(node == null) {  // Máx 50 reintentos = 500ms
+            while(node == null) {
                 node = clusterManager.getFreeNode();
 
                 if (node == null) {                 // Si no hay nodo disponible, reintentar (o esperar brevemente)

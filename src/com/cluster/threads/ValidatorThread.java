@@ -9,7 +9,7 @@ import java.util.Random;
 public class ValidatorThread implements Runnable {
 
     // Se define el tiempo de demora de esta etapa en milisegundos
-    private static final int DELAY_MS = 100;
+    private static final int DELAY_MS = 80;
 
     // Probabilidad de que un job sea válido (85%)
     private static final double VALID_PROBABILITY = 0.85;

@@ -9,7 +9,7 @@ public class AuditorThread implements Runnable {
 
     // definino el tiempo de demora de esta etapa en milisegundos
 
-    private static final int DELAY_MS = 10;
+    private static final int DELAY_MS = 60;
 
     // Probabilidad de que el resultado sea correcto (95%)
     private static final double CORRECT_PROBABILITY = 0.95;
