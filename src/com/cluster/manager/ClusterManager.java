@@ -7,10 +7,7 @@ import com.cluster.model.NodeState;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClusterManager {
@@ -85,7 +82,8 @@ public class ClusterManager {
      * @return el siguiente job disponible
      */
     public Job pollFromQueue() throws InterruptedException {
-        return jobsInQueue.take();
+
+        return jobsInQueue.poll(500, TimeUnit.MILLISECONDS );
     }
 
     /**
@@ -103,7 +101,7 @@ public class ClusterManager {
      * @return el siguiente job disponible
      */
     public Job pollFromExecution() throws InterruptedException {
-        return jobsInExecution.take();
+        return jobsInExecution.poll(500, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -138,6 +136,7 @@ public class ClusterManager {
         job.setStatus(JobStatus.FAILED);
         failedJobs.add(job);
         failedCount.incrementAndGet();
+        processedJobsCount.incrementAndGet();
     }
 
     /**
@@ -148,6 +147,7 @@ public class ClusterManager {
         job.setStatus(JobStatus.VALIDATED);
         validatedJobs.add(job);
         validatedCount.incrementAndGet();
+        processedJobsCount.incrementAndGet();
 
     }
 
@@ -156,7 +156,7 @@ public class ClusterManager {
      */
     public int[] getStats() {
         // retornar [failedCount, validatedCount]
-        return new int[]{failedCount.get(), validatedCount.get()};
+        return new int[]{failedCount.get(), validatedCount.get(), processedJobsCount.get()};
     }
 
     /**

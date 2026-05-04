@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class WorkerThread implements Runnable {
     // Se define el tiempo de demora de esta etapa en milisegundos
-    private static final int DELAY_MS = 100;
+    private static final int DELAY_MS = 150;
     // Probabilidad de que un job sea válido (90%)
     private static final double SUCCESS_PROBABILITY = 0.90;
 
@@ -32,10 +32,8 @@ public class WorkerThread implements Runnable {
 
                 if (isSuccess) {
                     clusterManager.moveToFinished(job);// Se mueve el job a finalizados
-                    clusterManager.incrementProcessed(); // Se incrementa el contador de procesados
                 } else {
                     clusterManager.moveToFailed(job); // Se mueve el job a fallidos
-                    clusterManager.incrementProcessed();// Se incrementa el contador de procesados
                 }
                 //Se aplica una demora fija
                 Thread.sleep(DELAY_MS);

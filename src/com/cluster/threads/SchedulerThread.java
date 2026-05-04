@@ -8,8 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SchedulerThread implements Runnable {
 
-    // TODO (equipo): definir el tiempo de demora de esta etapa en milisegundos
-    private static final int DELAY_MS = 0;
+    private static final int DELAY_MS = 100;
 
     private final ClusterManager clusterManager;
     private final AtomicInteger jobIdCounter;
@@ -38,18 +37,21 @@ public class SchedulerThread implements Runnable {
             Job job = new Job(jobId);
             //  buscar un nodo libre llamando a clusterManager.getFreeNode()
             ComputeNode node = null;
-
             while(node == null) {
                 node = clusterManager.getFreeNode();
+
                 if (node == null) {                 // Si no hay nodo disponible, reintentar (o esperar brevemente)
                     try {
+                        System.out.println("Scheduler: No se encontró nodo libre para job " + jobId);
                         Thread.sleep(10); // espera 10ms antes de reintentar
+
                     } catch (InterruptedException e){
                         Thread.currentThread().interrupt();
                         return;
                     }
                 }
             }
+
             // asignar el job al nodo (node.assignJob())
             node.assignJob();
             //  setear el assignedNodeId en el job

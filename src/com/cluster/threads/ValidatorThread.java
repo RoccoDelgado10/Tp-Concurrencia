@@ -9,7 +9,7 @@ import java.util.Random;
 public class ValidatorThread implements Runnable {
 
     // Se define el tiempo de demora de esta etapa en milisegundos
-    private static final int DELAY_MS = 100;
+    private static final int DELAY_MS = 80;
 
     // Probabilidad de que un job sea válido (85%)
     private static final double VALID_PROBABILITY = 0.85;
@@ -29,7 +29,7 @@ public class ValidatorThread implements Runnable {
 
             try {
                 // Se toma un job de la cola de validación
-                Job job = clusterManager.pollFromQueue();
+                Job job = clusterManager.pollFromQueue(); // Bloquea si queue vacia y retorna null si timeout
 
                 if (job == null) continue;
 
@@ -45,7 +45,6 @@ public class ValidatorThread implements Runnable {
                 } else {
                     node.setOutOfService(); //Se pone el nodo fuera de servicio
                     clusterManager.moveToFailed(job); //Se mueve el job a fallidos
-                    clusterManager.incrementProcessed(); //Se incrementa el contador de procesados
                 }
 
                 //Se aplica una demora fija

@@ -55,14 +55,20 @@ public class Main {
         // --- Logger (corre en paralelo a tod0) ---
         Thread loggerThread = new Thread(new Logger(clusterManager), "Logger");
 
-        // TODO: lanzar todos los hilos de allThreads
+        // lanzar todos los hilos de allThreads
+        for (Thread t : allThreads) t.start();
+        loggerThread.start();
 
-        // TODO: lanzar el loggerThread
-
-        // TODO: esperar a que todos los hilos terminen (join)
-
-        // TODO: esperar a que el loggerThread termine (join)
-
+        //esperamos a que los hilos terminen antes de finalizar el programa
+        for (Thread t : allThreads) {
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        //esperar a que el loggerThread termine (join)
+        loggerThread.join();
         System.out.println("Sistema finalizado. Revisar logs/cluster_stats.log para resultados.");
     }
 }
