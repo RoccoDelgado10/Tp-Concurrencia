@@ -35,7 +35,6 @@ public class WorkerThread implements Runnable {
                 } else {
                     clusterManager.moveToFailed(job); // Se mueve el job a fallidos
                 }
-                clusterManager.incrementProcessed();
                 //Se aplica una demora fija
                 Thread.sleep(DELAY_MS);
 

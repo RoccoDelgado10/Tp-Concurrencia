@@ -136,6 +136,7 @@ public class ClusterManager {
         job.setStatus(JobStatus.FAILED);
         failedJobs.add(job);
         failedCount.incrementAndGet();
+        processedJobsCount.incrementAndGet();
     }
 
     /**
@@ -146,6 +147,7 @@ public class ClusterManager {
         job.setStatus(JobStatus.VALIDATED);
         validatedJobs.add(job);
         validatedCount.incrementAndGet();
+        processedJobsCount.incrementAndGet();
 
     }
 

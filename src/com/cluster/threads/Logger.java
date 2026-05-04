@@ -60,7 +60,7 @@ public class Logger implements Runnable {
         int[] stats = clusterManager.getStats();
 
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss.SSS"));
-        String line = "[" + timestamp + "] Failed: " + stats[0] + " | Validated: " + stats[1] + "| Procesados" + stats[2];
+        String line = "[" + timestamp + "] Failed: " + stats[0] + " | Validated: " + stats[1] + " | Procesados: " + stats[2];
 
         writer.write(line);
         writer.newLine();
@@ -78,6 +78,10 @@ public class Logger implements Runnable {
         writer.write("==========================================");
         writer.newLine();
         writer.write("=== ESTADÍSTICAS FINALES ===");
+        writer.newLine();
+
+        int[] stats = clusterManager.getStats();
+        writer.write("Failed: " + stats[0] + " | Validated: " + stats[1] + " | Procesados: " + stats[2]);
         writer.newLine();
 
         // Stats de nodos

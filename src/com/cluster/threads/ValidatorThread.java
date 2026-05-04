@@ -45,7 +45,6 @@ public class ValidatorThread implements Runnable {
                 } else {
                     node.setOutOfService(); //Se pone el nodo fuera de servicio
                     clusterManager.moveToFailed(job); //Se mueve el job a fallidos
-                    clusterManager.incrementProcessed(); //Se incrementa el contador de procesados
                 }
 
                 //Se aplica una demora fija
