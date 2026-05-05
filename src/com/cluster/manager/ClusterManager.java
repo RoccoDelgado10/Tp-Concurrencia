@@ -7,7 +7,7 @@ import com.cluster.model.JobStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClusterManager {
@@ -182,18 +182,4 @@ public class ClusterManager {
 
     public ComputeNode[] getNodes() { return nodes; }
 
-    public int getQueueSize() {
-        synchronized (jobsInQueue) { return jobsInQueue.size(); }
-    }
-
-    public int getExecutionSize() {
-        synchronized (jobsInExecution) { return jobsInExecution.size(); }
-    }
-
-    public int getFinishedCount() {
-        synchronized (finishedJobs) { return finishedJobs.size(); }
-    }
-
-    public int getFailedCount()    { return failedCount.get(); }
-    public int getValidatedCount() { return validatedCount.get(); }
 }
