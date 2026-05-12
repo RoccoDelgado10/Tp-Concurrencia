@@ -30,11 +30,7 @@ public class AuditorThread implements Runnable {
                 // toma un job de finalizados (clusterManager.pollFromFinished())
                 Job job = clusterManager.pollFromFinished();
 
-                if (job == null) {
-                    // Si no hay jobs, esperar un poco antes de reintentar
-                    Thread.sleep(10);
-                    continue;
-                }
+                if (job == null) {continue;}
                 // Se simula validación con probabilidad VALID_PROBABILITY
                 boolean isCorrect = random.nextDouble() < CORRECT_PROBABILITY;
 

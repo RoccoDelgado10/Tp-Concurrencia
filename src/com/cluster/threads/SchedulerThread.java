@@ -14,7 +14,6 @@ public class SchedulerThread implements Runnable {
     private final AtomicInteger jobIdCounter;
     //usamos un AtomicInteger para evitar raceCondition en el jobIdCounter
     //AtomicInteger es thread safe y utiliza instrucciones a nivel de hardware (Más eficiente que Synchronized)
-    // podria pasar que dos hilos modifiquen la variable una modificación se pierda
 
     public SchedulerThread(ClusterManager clusterManager, AtomicInteger jobIdCounter) {
         this.clusterManager = clusterManager;
@@ -51,9 +50,6 @@ public class SchedulerThread implements Runnable {
                     }
                 }
             }
-
-            // asignar el job al nodo (node.assignJob())
-            node.assignJob();
             //  setear el assignedNodeId en el job
             job.setAssignedNodeId(node.getId());
             //  encolar el job (clusterManager.enqueueJob(job))

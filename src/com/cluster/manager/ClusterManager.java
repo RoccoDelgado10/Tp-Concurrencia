@@ -49,6 +49,10 @@ public class ClusterManager {
     // NODOS
     // -------------------------------------------------------------------------
 
+    /** Empieza en un número aleatorio, y se avanza en la lista de forma secuencial
+     *  distribuyendo la carga de forma aleatoria y no siempre en los primeros nodos
+     */
+
     public ComputeNode getFreeNode() {
         int start = ThreadLocalRandom.current().nextInt(TOTAL_NODES);
         for (int i = 0; i <= TOTAL_NODES; i++) {
@@ -77,7 +81,6 @@ public class ClusterManager {
 
     public Job pollFromQueue() throws InterruptedException {
         synchronized (jobsInQueue) {
-            // while en lugar de if para protegerse de spurious wakeups
             while (jobsInQueue.isEmpty() && !isFinished()) {
                 jobsInQueue.wait(500);
             }
@@ -103,7 +106,7 @@ public class ClusterManager {
         synchronized (jobsInExecution) {
             while (jobsInExecution.isEmpty() && !isFinished()) {
                 jobsInExecution.wait(500);
-            }
+        }
             if (jobsInExecution.isEmpty()) return null;
             return jobsInExecution.remove(0);
         }
@@ -118,11 +121,15 @@ public class ClusterManager {
         job.setStatus(JobStatus.FINISHED);
         synchronized (finishedJobs) {
             finishedJobs.add(job);
+            finishedJobs.notify();
         }
     }
 
-    public Job pollFromFinished() {
+    public Job pollFromFinished() throws InterruptedException{
         synchronized (finishedJobs) {
+            while (finishedJobs.isEmpty() && !isFinished()) {
+               finishedJobs.wait(500);
+            }
             if (finishedJobs.isEmpty()) return null;
             return finishedJobs.remove(0);
         }
@@ -170,10 +177,6 @@ public class ClusterManager {
 
     public boolean isFinished() {
         return processedJobsCount.get() >= TOTAL_JOBS;
-    }
-
-    public void incrementProcessed() {
-        processedJobsCount.incrementAndGet();
     }
 
     // -------------------------------------------------------------------------
