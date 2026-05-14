@@ -3,6 +3,7 @@ package com.cluster.manager;
 import com.cluster.model.ComputeNode;
 import com.cluster.model.Job;
 import com.cluster.model.JobStatus;
+import com.cluster.model.NodeState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +59,7 @@ public class ClusterManager {
         for (int i = 0; i <= TOTAL_NODES; i++) {
             int idx = (start + i) % TOTAL_NODES;
             synchronized (nodes[idx]) {
-                if (nodes[idx].isFree()) {
-                    nodes[idx].assignJob(); // marcar BUSY dentro del synchronized
+                if (nodes[idx].tryAssign()) {
                     return nodes[idx];
                 }
             }
@@ -71,7 +71,7 @@ public class ClusterManager {
     // ETAPA 1 → 2: jobsInQueue
     // -------------------------------------------------------------------------
 
-    public void enqueueJob(Job job) {
+    public void  enqueueJob(Job job) {
         job.setStatus(JobStatus.QUEUED);
         synchronized (jobsInQueue) {
             jobsInQueue.add(job);
