@@ -16,34 +16,28 @@ public class ComputeNode {
         return id;
     }
 
-    public synchronized NodeState getState() {
+    public NodeState getState() {
         return state;
     }
 
-    public synchronized boolean isFree() {
-        // retorna true solo si el estado es FREE
-        return this.state == NodeState.FREE;
-    }
-
-    public synchronized void assignJob() {
-        // cambia estado a BUSY
-        this.state = NodeState.BUSY;
-        // 2. Incrementa el contador de ejecuciones
-        this.executionCount++;
-    }
-
-    public synchronized void setFree() {
+    public void setFree() {
         // cambia estado a FREE
         this.state = NodeState.FREE;
     }
-
-    public synchronized void setOutOfService() {
-        // cambia estado a OUT_OF_SERVICE
-        this.state = NodeState.OUT_OF_SERVICE;
+    /** Juntamos la logica de isFree() con assingJob()
+     *  Checkeamos si está libre el nodo y marcamos busy
+     *  aumenta contador de ejecución
+    * */
+    public boolean tryAssign() {
+        if (this.state != NodeState.FREE) return false;
+        this.state = NodeState.BUSY;
+        this.executionCount++;
+        return true;
     }
 
-    public synchronized int getExecutionCount() {
-        return executionCount;
+    public void setOutOfService() {
+        // cambia estado a OUT_OF_SERVICE
+        this.state = NodeState.OUT_OF_SERVICE;
     }
 
     @Override
